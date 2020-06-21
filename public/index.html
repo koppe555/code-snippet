@@ -19,7 +19,7 @@
   </head>
   <body>
     <v-app id="app">
-      <v-toolbar color="red lighten-3" dark>
+      <v-toolbar color="yellow">
         <v-toolbar-title>Snippet App</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn flat v-on:click="togglePostModal()">New Snippet</v-btn>
@@ -28,18 +28,18 @@
         <v-layout>
           <v-flex xs5>
             <div style="margin:10px">
-              <h2>Select Language</h2>
+              <h2>Select tag</h2>
               <v-select
                 v-model="language"
                 :items="languages"
-                label="Language"
+                label="tag"
                 v-on:change="abstruct"
               ></v-select>
               <h2>Snippets Shortcut</h2>
               <ul>
                 <li v-for="snippet in snippetList">
                   <span id="name" v-on:click="goElem(snippet.id)"
-                    >[{{ snippet.language }}] {{ snippet.title }}</span
+                    >{{ snippet.title }} [{{ snippet.language }}]</span
                   >
                 </li>
               </ul>
@@ -56,10 +56,10 @@
             <v-card style="margin-top:10px" v-for="snippet in snippetList">
               <a v-bind:id="snippet.id"></a>
               <v-card-title primary-title>
-                <div style="background-color:#FFCDD2">
+                <div style="border-bottom: solid 3px #87CEFA">
                   <a v-bind:id="snippet.id"></a>
-                  <h3 class="headline">
-                    [{{ snippet.language }}] {{ snippet.title }}
+                  <h2 class="headline">
+                    {{ snippet.title }}
                   </h3>
                 </div>
               </v-card-title>
@@ -68,17 +68,16 @@
               </div>
 
               <v-card-actions>
-                <v-btn flat color="red" v-on:click="togglePutModal(snippet.id)"
+                <v-btn flat color="gray" v-on:click="togglePutModal(snippet.id)"
                   >Update</v-btn
                 >
                 <v-btn
                   flat
-                  color="gray"
+                  color="red"
                   v-on:click="toggleDeleteModal(snippet.id)"
                   >Delete</v-btn
                 >
                 <v-spacer></v-spacer>
-                <v-btn flat color="red" v-on:click="goTop">Go Top</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
@@ -102,7 +101,7 @@
             <v-flex d-flex>
               <v-text-field
                 v-model="postLanguage"
-                label="Language"
+                label="tag"
                 required
                 style="margin:20px; margin-bottom:0px; margin-left:20px"
               ></v-text-field>
@@ -325,9 +324,12 @@
               this.snippetList = [];
               for (i = 0; i < this.allData.length; i++) {
                 if (
-                  this.allData[i].contents.indexOf(this.searchWord) !== -1 ||
-                  this.allData[i].title.indexOf(this.searchWord) !== -1 ||
-                  this.allData[i].language.indexOf(this.searchWord) !== -1
+                  this.allData[i].contents.toLowerCase().indexOf(this.searchWord.toLowerCase()) !== -1 ||
+                  this.allData[i].title.toLowerCase().indexOf(this.searchWord.toLowerCase()) !== -1 ||
+                  this.allData[i].language.toLowerCase().indexOf(this.searchWord.toLowerCase()) !== -1 ||
+                  this.kanaToHira(this.allData[i].contents).indexOf(this.kanaToHira(this.searchWord)) !== -1 ||
+                  this.kanaToHira(this.allData[i].title).indexOf(this.kanaToHira(this.searchWord)) !== -1 ||
+                  this.kanaToHira(this.allData[i].language).indexOf(this.kanaToHira(this.searchWord)) !== -1
                 ) {
                   this.snippetList.push(this.allData[i]);
                 }
@@ -337,16 +339,25 @@
               for (i = 0; i < this.allData.length; i++) {
                 if (this.allData[i].language == this.language) {
                   if (
-                    this.allData[i].contents.indexOf(this.searchWord) !== -1 ||
-                    this.allData[i].title.indexOf(this.searchWord) !== -1 ||
-                    this.allData[i].language.indexOf(this.searchWord) !== -1
+                    this.allData[i].contents.toLowerCase().indexOf(this.searchWord.toLowerCase()) !== -1 ||
+                    this.allData[i].title.toLowerCase().indexOf(this.searchWord.toLowerCase()) !== -1 ||
+                    this.allData[i].language.toLowerCase().indexOf(this.searchWord.toLowerCase()) !== -1 ||
+                    this.kanaToHira(this.allData[i].contents).indexOf(this.kanaToHira(this.searchWord)) !== -1 ||
+                    this.kanaToHira(this.allData[i].title).indexOf(this.kanaToHira(this.searchWord)) !== -1 ||
+                    this.kanaToHira(this.allData[i].language).indexOf(this.kanaToHira(this.searchWord)) !== -1
                   ) {
                     this.snippetList.push(this.allData[i]);
                   }
                 }
               }
             }
-          }
+          },
+          kanaToHira: function(str) {
+            return str.replace(/[\u30a1-\u30f6]/g, function(match) {
+                var chr = match.charCodeAt(0) - 0x60;
+                return String.fromCharCode(chr);
+                });
+          },
         }
       });
     </script>
